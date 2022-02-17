@@ -1,4 +1,5 @@
-from db import db
+from models import db
+# from backend.models.car import Car
 from flask import jsonify
 from flask_restful import Resource
 from models.car import Car
