@@ -1,9 +1,8 @@
-from models import db
-# from backend.models.car import Car
-from flask import jsonify
+from flask import jsonify, request
 from flask_restful import Resource
+from models import db
 from models.car import Car
-from schema.car_schema import CarSchema
+from schema.car_schema import CarCreateRequest, CarSchema
 from werkzeug.exceptions import NotFound
 
 
@@ -22,3 +21,16 @@ class CarsListResource(Resource):
         cars = db.session.query(Car).order_by(Car.id).all()
         schema = CarSchema(many=True)
         return schema.dump(cars)
+
+    def post(self):
+        schema = CarCreateRequest()
+        data = request.get_json()
+        new_car = schema.load(data)
+
+        is_created = Car.create_car(new_car)
+
+        if is_created:
+            db.session.commit()
+            return CarSchema().dump(new_car)
+        else:
+            return jsonify({"message": "Car not created"})
